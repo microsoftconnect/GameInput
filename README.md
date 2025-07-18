@@ -26,10 +26,26 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 
 ## Version History
 
+### Version 2.0
+
+*   Added support for advanced haptics for audio-driven devices including the PlayStation&#174;5 DualSense&#174; controller.
+*   Added support for sensors supported by the Windows sensor stack.
+*   Added support for DirectInput driver `DirectInputEscape` call.
+*   Added support for running GameInput in the WINE environment on Linux-based systems.
+*   Added support for optional background gamepad input across gamepad drivers.
+*   Added `revisionNumber`, `hardwareVersion`, `firmwareVersion`, and `containerId` to `GameInputDeviceInfo`.
+*   Fixed GIP devices reporting incorrect PNP paths in `GameInputDeviceInfo`.
+*   Fixed an issue where GIP devices would not report raw readings in older versions of the API.
+*   Increased API version to 2.
+
+"PlayStation" is a registered trademark or trademark of Sony Interactive Entertainment Inc.
+
+"DualSense" is a registered trademark or trademark of Sony Interactive Entertainment Inc.
+
 ### Version 1.2
 
 *   Fix inverted axis mapping on multiple controllers.
-*   Fix two second timeout on process shutdown for games that leak the IGameInput instance.
+*   Fix two second timeout on process shutdown for games that leak the `IGameInput` instance.
 *   GameInput will now automatically reconnect to the GameInput service when it is upgraded.
 *   Increase the callback backlog to provide more time for games to process GameInput notifications.
 
@@ -68,11 +84,13 @@ Example:
 
 #if GAMEINPUT_API_VERSION == 1
 using namespace GameInput::v1;
+#elif GAMEINPUT_API_VERSION == 2
+using namespace GameInput::v2;
 #endif
 
 // ...
 
-#if GAMEINPUT_API_VERSION >= 1
+#if GAMEINPUT_API_VERSION >= 2
     device->GetDeviceInfo(&deviceInfo);
 #else
     deviceInfo = device->GetDeviceInfo();
