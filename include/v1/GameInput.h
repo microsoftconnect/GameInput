@@ -12,9 +12,9 @@
 #pragma region Application Family or OneCore Family or Games Family
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)
 
-#define GAMEINPUT_API_VERSION 2
+#define GAMEINPUT_API_VERSION 1
 
-namespace GameInput { namespace v2 {
+namespace GameInput { namespace v1 {
 
 enum GameInputKind
 {
@@ -25,7 +25,6 @@ enum GameInputKind
     GameInputKindController       = 0x0000000E,
     GameInputKindKeyboard         = 0x00000010,
     GameInputKindMouse            = 0x00000020,
-    GameInputKindSensors          = 0x00000040,
     GameInputKindArcadeStick      = 0x00010000,
     GameInputKindFlightStick      = 0x00020000,
     GameInputKindGamepad          = 0x00040000,
@@ -45,12 +44,12 @@ enum GameInputEnumerationKind
 enum GameInputFocusPolicy
 {
     GameInputDefaultFocusPolicy             = 0x00000000,
+    GameInputDisableBackgroundInput         = 0x00000001,
     GameInputExclusiveForegroundInput       = 0x00000002,
+    GameInputDisableBackgroundGuideButton   = 0x00000004,
     GameInputExclusiveForegroundGuideButton = 0x00000008,
-    GameInputExclusiveForegroundShareButton = 0x00000020,
-    GameInputEnableBackgroundInput          = 0x00000040,
-    GameInputEnableBackgroundGuideButton    = 0x00000080,
-    GameInputEnableBackgroundShareButton    = 0x00000100
+    GameInputDisableBackgroundShareButton   = 0x00000010,
+    GameInputExclusiveForegroundShareButton = 0x00000020
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(GameInputFocusPolicy);
@@ -108,25 +107,6 @@ enum GameInputMousePositions
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(GameInputMousePositions)
-
-enum GameInputSensorsKind
-{
-    GameInputSensorsNone            = 0x00000000,
-    GameInputSensorsAccelerometer   = 0x00000001,
-    GameInputSensorsGyrometer       = 0x00000002,
-    GameInputSensorsCompass         = 0x00000004,
-    GameInputSensorsOrientation     = 0x00000008
-};
-
-DEFINE_ENUM_FLAG_OPERATORS(GameInputSensorsKind);
-
-enum GameInputSensorAccuracy
-{
-    GameInputSensorAccuracyUnknown      = 0x00000000,
-    GameInputSensorAccuracyUnreliable   = 0x00000001,
-    GameInputSensorAccuracyApproximate  = 0x00000002,
-    GameInputSensorAccuracyHigh         = 0x00000003
-};
 
 enum GameInputArcadeStickButtons
 {
@@ -234,10 +214,9 @@ DEFINE_ENUM_FLAG_OPERATORS(GameInputSystemButtons)
 
 enum GameInputDeviceStatus
 {
-    GameInputDeviceNoStatus        = 0x00000000,
-    GameInputDeviceConnected       = 0x00000001,
-    GameInputDeviceHapticInfoReady = 0x00200000,
-    GameInputDeviceAnyStatus       = 0xFFFFFFFF
+    GameInputDeviceNoStatus  = 0x00000000,
+    GameInputDeviceConnected = 0x00000001,
+    GameInputDeviceAnyStatus = 0xFFFFFFFF
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(GameInputDeviceStatus);
@@ -436,15 +415,6 @@ interface IGameInputForceFeedbackEffect;
 
 typedef uint64_t GameInputCallbackToken;
 
-DEFINE_GUID(GAMEINPUT_HAPTIC_LOCATION_NONE,          0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-DEFINE_GUID(GAMEINPUT_HAPTIC_LOCATION_GRIP_LEFT,     0x08c707c2, 0x66bb, 0x406c, 0xa8, 0x4a, 0xdf, 0xe0, 0x85, 0x12, 0x0a, 0x92);
-DEFINE_GUID(GAMEINPUT_HAPTIC_LOCATION_GRIP_RIGHT,    0x155a0b77, 0x8bb2, 0x40db, 0x86, 0x90, 0xb6, 0xd4, 0x11, 0x26, 0xdf, 0xc1);
-DEFINE_GUID(GAMEINPUT_HAPTIC_LOCATION_TRIGGER_LEFT,  0x8de4d896, 0x5559, 0x4081, 0x86, 0xe5, 0x17, 0x24, 0xcc, 0x07, 0xc6, 0xbc);
-DEFINE_GUID(GAMEINPUT_HAPTIC_LOCATION_TRIGGER_RIGHT, 0xff0cb557, 0x3af5, 0x406b, 0x8b, 0x0f, 0x55, 0x5a, 0x2d, 0x92, 0xa2, 0x20);
-
-constexpr uint32_t GAMEINPUT_HAPTIC_MAX_LOCATIONS              = 8;
-constexpr uint32_t GAMEINPUT_HAPTIC_MAX_AUDIO_ENDPOINT_ID_SIZE = 256;
-
 typedef void (CALLBACK* GameInputReadingCallback)(
     _In_ GameInputCallbackToken callbackToken,
     _In_ void* context,
@@ -492,37 +462,6 @@ struct GameInputMouseState
     int64_t                 absolutePositionY;
     int64_t                 wheelX;
     int64_t                 wheelY;
-};
-
-struct GameInputVersion
-{
-    uint16_t major;
-    uint16_t minor;
-    uint16_t build;
-    uint16_t revision;
-};
-
-struct GameInputSensorsState
-{
-    // GameInputSensorsAccelerometer
-    float accelerationInGX;
-    float accelerationInGY;
-    float accelerationInGZ;
-
-    // GameInputSensorsGyrometer
-    float angularVelocityInRadPerSecX;
-    float angularVelocityInRadPerSecY;
-    float angularVelocityInRadPerSecZ;
-
-    // GameInputSensorsCompass
-    float headingInDegreesFromMagneticNorth;
-    GameInputSensorAccuracy headingAccuracy;
-
-    // GameInputSensorsOrientation
-    float orientationW;
-    float orientationX;
-    float orientationY;
-    float orientationZ;
 };
 
 struct GameInputArcadeStickState
@@ -609,11 +548,6 @@ struct GameInputMouseInfo
     uint32_t              sampleRate;
     bool                  hasWheelX;
     bool                  hasWheelY;
-};
-
-struct GameInputSensorsInfo
-{
-    GameInputSensorsKind supportedSensors;
 };
 
 struct GameInputArcadeStickInfo
@@ -724,23 +658,18 @@ struct GameInputDeviceInfo
 {
     uint16_t               vendorId;
     uint16_t               productId;
-    uint16_t               revisionNumber;
     GameInputUsage         usage;
-    GameInputVersion       hardwareVersion;
-    GameInputVersion       firmwareVersion;
     APP_LOCAL_DEVICE_ID    deviceId;
     APP_LOCAL_DEVICE_ID    deviceRootId;
     GameInputDeviceFamily  deviceFamily;
     GameInputKind          supportedInput;
     GameInputRumbleMotors  supportedRumbleMotors;
     GameInputSystemButtons supportedSystemButtons;
-    GUID                   containerId;
     const char*            displayName;
     const char*            pnpPath;
 
     _Field_size_full_opt_(1) const GameInputKeyboardInfo*     keyboardInfo;
     _Field_size_full_opt_(1) const GameInputMouseInfo*        mouseInfo;
-    _Field_size_full_opt_(1) const GameInputSensorsInfo*      sensorsInfo;
     _Field_size_full_opt_(1) const GameInputArcadeStickInfo*  arcadeStickInfo;
     _Field_size_full_opt_(1) const GameInputFlightStickInfo*  flightStickInfo;
     _Field_size_full_opt_(1) const GameInputGamepadInfo*      gamepadInfo;
@@ -758,13 +687,6 @@ struct GameInputDeviceInfo
 
     uint32_t forceFeedbackMotorCount;
     _Field_size_full_(forceFeedbackMotorCount) const GameInputForceFeedbackMotorInfo* forceFeedbackMotorInfo;
-};
-
-struct GameInputHapticInfo
-{
-    _Field_z_ wchar_t                                         audioEndpointId[GAMEINPUT_HAPTIC_MAX_AUDIO_ENDPOINT_ID_SIZE];
-    _Field_range_(1, GAMEINPUT_HAPTIC_MAX_LOCATIONS) uint32_t locationCount;
-    _Field_size_full_(locationCount) GUID                     locations[GAMEINPUT_HAPTIC_MAX_LOCATIONS];
 };
 
 struct GameInputForceFeedbackEnvelope
@@ -850,9 +772,9 @@ struct GameInputRumbleParams
     float rightTrigger;
 };
 
-const IID IID_IGameInput = {0xbbaa66d2, 0x837a, 0x40f7, { 0xa3, 0x03, 0x91, 0x7d, 0x50, 0x09, 0x55, 0xf4} };
+const IID IID_IGameInput = {0x40ffb7e4, 0x6150, 0x407a, 0xb4, 0x39, 0x13, 0x2b, 0xad, 0xc0, 0x8d, 0x2d};
 
-DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "BBAA66D2-837A-40F7-A303-917D500955F4")
+DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "40FFB7E4-6150-407A-B439-132BADC08D2D")
 {
     IFACEMETHOD_(uint64_t, GetCurrentTimestamp)() PURE;
 
@@ -923,7 +845,7 @@ DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "BBAA66D2-837A-40F7-A303-917D500955
         _In_ GameInputFocusPolicy policy) PURE;
 };
 
-DECLARE_INTERFACE_IID_(IGameInputReading, IUnknown, "65F06483-DB76-40B7-B745-F591FAE55FC9")
+DECLARE_INTERFACE_IID_(IGameInputReading, IUnknown, "86318E60-0B3C-40D6-BEFA-C62F2D952724")
 {
     IFACEMETHOD_(GameInputKind, GetInputKind)() PURE;
 
@@ -959,9 +881,6 @@ DECLARE_INTERFACE_IID_(IGameInputReading, IUnknown, "65F06483-DB76-40B7-B745-F59
     IFACEMETHOD_(bool, GetMouseState)(
         _Out_ GameInputMouseState* state) PURE;
 
-    IFACEMETHOD_(bool, GetSensorsState)(
-        _Out_ GameInputSensorsState* state) PURE;
-
     IFACEMETHOD_(bool, GetArcadeStickState)(
         _Out_ GameInputArcadeStickState* state) PURE;
 
@@ -978,13 +897,10 @@ DECLARE_INTERFACE_IID_(IGameInputReading, IUnknown, "65F06483-DB76-40B7-B745-F59
         _Out_ GameInputUiNavigationState* state) PURE;
 };
 
-DECLARE_INTERFACE_IID_(IGameInputDevice, IUnknown, "39A0C9F2-F055-4089-96E7-25B2756D3077")
+DECLARE_INTERFACE_IID_(IGameInputDevice, IUnknown, "B169652A-4A32-40D7-9FA9-905997952516")
 {
     IFACEMETHOD(GetDeviceInfo)(
         _Outptr_ const GameInputDeviceInfo** info) PURE;
-
-    IFACEMETHOD(GetHapticInfo)(
-        _Out_ GameInputHapticInfo* info) PURE;
 
     IFACEMETHOD_(GameInputDeviceStatus, GetDeviceStatus)() PURE;
 
@@ -1002,14 +918,6 @@ DECLARE_INTERFACE_IID_(IGameInputDevice, IUnknown, "39A0C9F2-F055-4089-96E7-25B2
 
     IFACEMETHOD_(void, SetRumbleState)(
         _In_opt_ const GameInputRumbleParams* params) PURE;
-
-    IFACEMETHOD(DirectInputEscape)(
-        _In_ uint32_t command,
-        _In_reads_bytes_(bufferInSize) const void* bufferIn,
-        _In_ uint32_t bufferInSize,
-        _Out_writes_bytes_(bufferOutSize) void* bufferOut,
-        _In_ uint32_t bufferOutSize,
-        _Out_opt_ uint32_t* bufferOutSizeWritten) PURE;
 };
 
 DECLARE_INTERFACE_IID_(IGameInputDispatcher, IUnknown, "415EED2E-98CB-42C2-8F28-B94601074E31")
@@ -1021,7 +929,7 @@ DECLARE_INTERFACE_IID_(IGameInputDispatcher, IUnknown, "415EED2E-98CB-42C2-8F28-
         _Outptr_result_nullonfailure_ HANDLE* waitHandle) PURE;
 };
 
-DECLARE_INTERFACE_IID_(IGameInputForceFeedbackEffect, IUnknown, "FF61096A-3373-4093-A1DF-6D31846B3511")
+DECLARE_INTERFACE_IID_(IGameInputForceFeedbackEffect, IUnknown, "51BDA05E-F742-45D9-B085-9444AE48381D")
 {
     IFACEMETHOD_(void, GetDevice)(
         _Outptr_ IGameInputDevice** device) PURE;
@@ -1069,17 +977,15 @@ inline _Must_inspect_result_ HRESULT GameInputCreate(
 
 const LONG GAMEINPUT_FACILITY = 0x38A;
 
-const HRESULT GAMEINPUT_E_DEVICE_DISCONNECTED               = _HRESULT_TYPEDEF_(0x838A0001L);
-const HRESULT GAMEINPUT_E_DEVICE_NOT_FOUND                  = _HRESULT_TYPEDEF_(0x838A0002L);
-const HRESULT GAMEINPUT_E_READING_NOT_FOUND                 = _HRESULT_TYPEDEF_(0x838A0003L);
-const HRESULT GAMEINPUT_E_REFERENCE_READING_TOO_OLD         = _HRESULT_TYPEDEF_(0x838A0004L);
-const HRESULT GAMEINPUT_E_FEEDBACK_NOT_SUPPORTED            = _HRESULT_TYPEDEF_(0x838A0007L);
-const HRESULT GAMEINPUT_E_OBJECT_NO_LONGER_EXISTS           = _HRESULT_TYPEDEF_(0x838A0008L);
-const HRESULT GAMEINPUT_E_CALLBACK_NOT_FOUND                = _HRESULT_TYPEDEF_(0x838A0009L);
-const HRESULT GAMEINPUT_E_HAPTIC_INFO_NOT_FOUND             = _HRESULT_TYPEDEF_(0x838A000AL);
-const HRESULT GAMEINPUT_E_AGGREGATE_OPERATION_NOT_SUPPORTED = _HRESULT_TYPEDEF_(0x838A000BL);
+const HRESULT GAMEINPUT_E_DEVICE_DISCONNECTED       = _HRESULT_TYPEDEF_(0x838A0001L);
+const HRESULT GAMEINPUT_E_DEVICE_NOT_FOUND          = _HRESULT_TYPEDEF_(0x838A0002L);
+const HRESULT GAMEINPUT_E_READING_NOT_FOUND         = _HRESULT_TYPEDEF_(0x838A0003L);
+const HRESULT GAMEINPUT_E_REFERENCE_READING_TOO_OLD = _HRESULT_TYPEDEF_(0x838A0004L);
+const HRESULT GAMEINPUT_E_FEEDBACK_NOT_SUPPORTED    = _HRESULT_TYPEDEF_(0x838A0007L);
+const HRESULT GAMEINPUT_E_OBJECT_NO_LONGER_EXISTS   = _HRESULT_TYPEDEF_(0x838A0008L);
+const HRESULT GAMEINPUT_E_CALLBACK_NOT_FOUND        = _HRESULT_TYPEDEF_(0x838A0009L);
 
-}} // namespace GameInput::v2
+}} // namespace GameInput::v1
 
 #endif // #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)
 #pragma endregion // Application Family or OneCore Family or Games Family
