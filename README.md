@@ -26,6 +26,15 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 
 ## Version History
 
+### Version 2.2
+
+*   Fixed mice and keyboards not being detected after being unplugged and re-plugged into same port.
+*   Fixed issue which caused rumble to become unresponsive on certain devices when under load.
+*   Fixed background input not working on gamepads plugged in after the input policy is specified.
+*   Fixed haptic devices not getting detected when plugged in after application start.
+*   Updated `GameInput.lib` for improved cross-platform support; source code is now also included.
+*   Miscellaneous plug and play reliability improvements for HID and GIP devices.
+
 ### Version 2.0
 
 *   Added support for advanced haptics for audio-driven devices including the PlayStation&#174;5 DualSense&#174; controller.
