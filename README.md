@@ -35,6 +35,15 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 *   Updated `GameInput.lib` for improved cross-platform support; source code is now also included.
 *   Miscellaneous plug and play reliability improvements for HID and GIP devices.
 
+### Version 2.1
+
+*   Fixed force feedback not working correctly in applications with multiple windows.
+*   Fixed missing mouse and keyboard readings in applications using RawInput outside of GameInput.
+*   Fixed the `supportedSystemButtons` field not being correctly populated for some devices.
+*   Removed unnecessary `OutputDebugString` logging.
+*   Improved support for UWP applications.
+*   Stability and performance improvements.
+
 ### Version 2.0
 
 *   Added support for advanced haptics for audio-driven devices including the PlayStation&#174;5 DualSense&#174; controller.
