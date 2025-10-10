@@ -525,11 +525,3 @@ STDAPI GameInputInitialize(
 {
     return GameInput::GameInputCreateWithVersion(riid, ppv);
 }
-
-STDAPI GameInputCreate(
-    _COM_Outptr_ IUnknown** unknown) noexcept
-{
-    return GameInput::GameInputCreateWithVersion(
-        GameInput::IID_IGameInput_v0,
-        reinterpret_cast<LPVOID*>(unknown));
-}

@@ -26,6 +26,21 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 
 ## Version History
 
+### Version 3.0
+
+*   Added support for aggregate devices.
+*   Added support for querying device input mappings.
+*   Added support for querying gamepads of varying capabilities.
+*   Added support for GIP raw device reports in the latest header.
+*   Added VID/PID values for game controllers on Linux-based systems.
+*   Added GameInputInitialize for specifying API version during creation.
+*   Removed support for UI navigation; it is still available via old headers.
+*   Fixed VID/PID not being reported correctly for some wireless controllers.
+*   Fixed performance regression for Xbox One controllers on Windows 10.
+*   Fixed hardware and firmware version not being exposed via old headers.
+*   Stability and performance improvements.
+*   Increased API version to 3.
+
 ### Version 2.2
 
 *   Fixed mice and keyboards not being detected after being unplugged and re-plugged into same port.
@@ -84,7 +99,7 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 *   Exposed additional device information, including PnP path and display name.
 *   Removed deprecated APIs, fields, and constants.
 
-While this version of GameInput is applicable to PC only, if you are using a previous version of GameInput on PC, or sharing code with GameInput on Xbox using the GDK, please note that many unimplemented functions and corresponding enums and constants have been removed. Additionally, the API has been placed in the `GameInput::v1` namespace to facilitate versioning. Due to these changes, you may experience compilation errors when building that code using this (and future) versions. Notable changes include:
+While this version of GameInput is applicable to PC only, if you are using a previous version of GameInput on PC, or sharing code with GameInput on Xbox using the GDK, please note that many unimplemented functions and corresponding enums and constants have been removed. Additionally, the API has been placed in the `GameInput::v1` namespace to facilitate versioning. Future versions of GameInput will be in their own versioned namespaces. Due to these changes, you may experience compilation errors when building that code using this (and future) versions. Notable changes include:
 
 1. `IGameInputDevice::GetDeviceInfo` previously returned the resulting `IGameInputDeviceInfo` struct as the function's return value. This struct is now returned as an out parameter on the function, and the function's return value is now an `HRESULT`.
 
@@ -104,6 +119,8 @@ Example:
 using namespace GameInput::v1;
 #elif GAMEINPUT_API_VERSION == 2
 using namespace GameInput::v2;
+#elif GAMEINPUT_API_VERSION == 3
+using namespace GameInput::v3;
 #endif
 
 // ...
