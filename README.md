@@ -26,6 +26,13 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 
 ## Version History
 
+### Version 3.1
+
+*   Fixed incorrect button, axis, and switch counts reported in v0 - v2 of the API.
+*   Compatibility improvements for applications relying on `GameInputBlockingEnumeration`.
+*   Compatibility improvements for wireless devices.
+*   Stability and performance improvements.
+
 ### Version 3.0
 
 *   Added support for aggregate devices.
@@ -33,7 +40,9 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 *   Added support for querying gamepads of varying capabilities.
 *   Added support for GIP raw device reports in the latest header.
 *   Added VID/PID values for game controllers on Linux-based systems.
-*   Added GameInputInitialize for specifying API version during creation.
+*   Added `GameInputInitialize` for specifying API version during creation.
+*   Added ability to query unmapped inputs for accessing extra axes and buttons.
+*   Added some mapped gamepad buttons for flight sticks and racing wheels.
 *   Removed support for UI navigation; it is still available via old headers.
 *   Fixed VID/PID not being reported correctly for some wireless controllers.
 *   Fixed performance regression for Xbox One controllers on Windows 10.
