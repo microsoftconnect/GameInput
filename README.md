@@ -26,6 +26,14 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 
 ## Version History
 
+### Version 3.2
+
+*   Added new device registry mappings.
+*   Added limited protection for applications that mismanage reference counts.
+*   Fixed compatibility issue for the `GAMEINPUT_CURRENT_CALLBACK_TOKEN_VALUE` value.
+*   Removed implicit dependency on `initguid.h` for GUID constants.
+*   Stability and performance improvements.
+
 ### Version 3.1
 
 *   Fixed incorrect button, axis, and switch counts reported in v0 - v2 of the API.
