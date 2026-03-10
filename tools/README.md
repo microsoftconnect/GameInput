@@ -5,7 +5,7 @@
 ### Overview
 GameInput Device Configuration Tool is a utility that allows hardware developers to test how the GameInput API recognizes and maps their devices.
 
-Input Kind mappings should only be done for a device with HID support. If mappings are generated for a non-HID device, GameInput will ignore the mappings.
+Input Kind mappings should only be done for a device with HID support. If mappings are generated for a non-HID device, GameInput will ignore the mappings. XInput and GIP devices have fixed mappings but can still map haptics and sensors settings for GameInput with this tool.
 
 This tool works best with the latest version of GameInput.
 
