@@ -68,7 +68,7 @@ public:
     }
 
     HRESULT Resize(
-        _In_ size_t count) noexcept
+        size_t count) noexcept
     {
         if (count > m_capacity)
         {
@@ -98,13 +98,13 @@ public:
     }
 
     T& operator[](
-        _In_ size_t index) noexcept
+        size_t index) noexcept
     {
         return m_data[index];
     }
 
     const T& operator[](
-        _In_ size_t index) const noexcept
+        size_t index) const noexcept
     {
         return m_data[index];
     }
@@ -156,7 +156,7 @@ public:
     }
 
     HRESULT Resize(
-        _In_ size_t length) noexcept
+        size_t length) noexcept
     {
         if (length >= m_string.GetCount())
         {

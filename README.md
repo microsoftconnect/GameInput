@@ -26,6 +26,22 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 
 ## Version History
 
+### Version 3.3
+
+*   Added support for controller paddles.
+*   Added support for PlayStation&#174;5 DualSense&#174; gyroscope.
+*   Added support for automatic device grouping by PNP container ID.
+*   Added native support for ARM.
+*   Fixed a bug where the original Xbox One Elite controller reported as multiple devices.
+*   Improved controller support for console/terminal applications.
+*   Enable CFG for exception handling continuations.
+*   Stability and performance improvements.
+*   Previously, this NuGet package only impacted x64 builds of a project. Starting with this version, referencing this package will now impact console builds as well. This package will override the GameInput version distributed with the GDK and use the new GameInput runtime on console.
+
+"PlayStation" is a registered trademark or trademark of Sony Interactive Entertainment Inc.
+
+"DualSense" is a registered trademark or trademark of Sony Interactive Entertainment Inc.
+
 ### Version 3.2
 
 *   Added new device registry mappings.
