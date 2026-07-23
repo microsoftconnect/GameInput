@@ -24,6 +24,10 @@ GameInput is a next-generation input API that exposes input devices of all kinds
 
     GameInput was designed with ease of use as a top priority. Most common input tasks can be implemented with just a few lines of code.
 
+## Companion helpers
+
+* [DualSense helper](companion/DualSense/README.md) — header-only helper for sending raw DualSense output reports through GameInput.
+
 ## Version History
 
 ### Version 3.3
