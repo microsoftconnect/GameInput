@@ -63,7 +63,7 @@ public:
     {
         if (m_data != nullptr)
         {
-            LocalFree(m_data);
+            HeapFree(GetProcessHeap(), 0, m_data);
         }
     }
 
@@ -74,13 +74,13 @@ public:
         {
             const size_t capacity = (m_capacity + count) * 2;
 
-            T* const data = static_cast<T*>(LocalAlloc(LPTR, capacity * sizeof(T)));
+            T* const data = static_cast<T*>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, capacity * sizeof(T))));
             RETURN_IF_NULL_ALLOC(data);
 
             if (m_data != nullptr)
             {
                 memcpy_s(data, count * sizeof(T), m_data, m_count * sizeof(T));
-                LocalFree(m_data);
+                HeapFree(GetProcessHeap(), 0, m_data);
             }
 
             m_data = data;
