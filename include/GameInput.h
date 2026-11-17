@@ -1,4 +1,24 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.
+//
+// This file is licensed under the MIT License.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
 #pragma once
 
@@ -12,9 +32,9 @@
 #pragma region Application Family or OneCore Family or Games Family
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)
 
-#define GAMEINPUT_API_VERSION 3
+#define GAMEINPUT_API_VERSION 4
 
-namespace GameInput { namespace v3 {
+namespace GameInput { namespace v4 {
 
 enum GameInputKind
 {
@@ -31,29 +51,21 @@ enum GameInputKind
     GameInputKindFlightStick      = 0x00020000,
     GameInputKindGamepad          = 0x00040000,
     GameInputKindRacingWheel      = 0x00080000,
+    GameInputKindLighting         = 0x00100000,
+    GameInputKindSystemButton     = 0x00200000,
+    GameInputKindTouch            = 0x00400000,
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(GameInputKind)
 
-enum GameInputEnumerationKind
+enum GameInputDeviceEvent
 {
-    GameInputNoEnumeration       = 0,
-    GameInputAsyncEnumeration    = 1,
-    GameInputBlockingEnumeration = 2
+    GameInputDeviceEventConnected             = 0,
+    GameInputDeviceEventDisconnected          = 1,
+    GameInputDeviceEventKeyboardLayoutUpdated = 2,
+    GameInputDeviceEventHapticInfoUpdated     = 3,
+    GameInputDeviceEventXInputIndexUpdated    = 4,
 };
-
-enum GameInputFocusPolicy
-{
-    GameInputDefaultFocusPolicy             = 0x00000000,
-    GameInputExclusiveForegroundInput       = 0x00000002,
-    GameInputExclusiveForegroundGuideButton = 0x00000008,
-    GameInputExclusiveForegroundShareButton = 0x00000020,
-    GameInputEnableBackgroundInput          = 0x00000040,
-    GameInputEnableBackgroundGuideButton    = 0x00000080,
-    GameInputEnableBackgroundShareButton    = 0x00000100
-};
-
-DEFINE_ENUM_FLAG_OPERATORS(GameInputFocusPolicy)
 
 enum GameInputSwitchKind
 {
@@ -130,21 +142,23 @@ enum GameInputSensorAccuracy
 
 enum GameInputArcadeStickButtons
 {
-    GameInputArcadeStickNone     = 0x00000000,
-    GameInputArcadeStickMenu     = 0x00000001,
-    GameInputArcadeStickView     = 0x00000002,
-    GameInputArcadeStickUp       = 0x00000004,
-    GameInputArcadeStickDown     = 0x00000008,
-    GameInputArcadeStickLeft     = 0x00000010,
-    GameInputArcadeStickRight    = 0x00000020,
-    GameInputArcadeStickAction1  = 0x00000040,
-    GameInputArcadeStickAction2  = 0x00000080,
-    GameInputArcadeStickAction3  = 0x00000100,
-    GameInputArcadeStickAction4  = 0x00000200,
-    GameInputArcadeStickAction5  = 0x00000400,
-    GameInputArcadeStickAction6  = 0x00000800,
-    GameInputArcadeStickSpecial1 = 0x00001000,
-    GameInputArcadeStickSpecial2 = 0x00002000
+    GameInputArcadeStickNone              = 0x00000000,
+    GameInputArcadeStickMenu              = 0x00000001,
+    GameInputArcadeStickView              = 0x00000002,
+    GameInputArcadeStickUp                = 0x00000004,
+    GameInputArcadeStickDown              = 0x00000008,
+    GameInputArcadeStickLeft              = 0x00000010,
+    GameInputArcadeStickRight             = 0x00000020,
+    GameInputArcadeStickAction1           = 0x00000040,
+    GameInputArcadeStickAction2           = 0x00000080,
+    GameInputArcadeStickAction3           = 0x00000100,
+    GameInputArcadeStickAction4           = 0x00000200,
+    GameInputArcadeStickAction5           = 0x00000400,
+    GameInputArcadeStickAction6           = 0x00000800,
+    GameInputArcadeStickSpecial1          = 0x00001000,
+    GameInputArcadeStickSpecial2          = 0x00002000,
+    GameInputArcadeStickLeftThumbstick    = 0x00004000,
+    GameInputArcadeStickRightThumbstick   = 0x00008000
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(GameInputArcadeStickButtons)
@@ -209,8 +223,9 @@ DEFINE_ENUM_FLAG_OPERATORS(GameInputGamepadButtons)
 
 enum GameInputRawDeviceReportKind
 {
-    GameInputRawInputReport  = 0,
-    GameInputRawOutputReport = 1,
+    GameInputRawInputReport   = 0,
+    GameInputRawOutputReport  = 1,
+    GameInputRawFeatureReport = 2,
 };
 
 // Gamepad modules (Groupings of gamepad elements commonly found together)
@@ -343,16 +358,6 @@ enum GameInputRacingWheelAxes
 
 DEFINE_ENUM_FLAG_OPERATORS(GameInputRacingWheelAxes)
 
-enum GameInputDeviceStatus
-{
-    GameInputDeviceNoStatus        = 0x00000000,
-    GameInputDeviceConnected       = 0x00000001,
-    GameInputDeviceHapticInfoReady = 0x00200000,
-    GameInputDeviceAnyStatus       = 0xFFFFFFFF
-};
-
-DEFINE_ENUM_FLAG_OPERATORS(GameInputDeviceStatus)
-
 enum GameInputDeviceFamily
 {
     GameInputFamilyVirtual   = -1,
@@ -363,6 +368,22 @@ enum GameInputDeviceFamily
     GameInputFamilyI8042     =  4,
     GameInputFamilyAggregate =  5,
 };
+
+enum GameInputLightingGroups
+{
+    GameInputLightingGroupUnknown          = 0x00000000,
+    GameInputLightingGroupLeftThumbstick   = 0x00000001,
+    GameInputLightingGroupRightThumbstick  = 0x00000002,
+    GameInputLightingGroupDPad             = 0x00000004,
+    GameInputLightingGroupFaceButtons      = 0x00000008,
+    GameInputLightingGroupCenterLight      = 0x00000010,
+    GameInputLightingGroupKeyboardKey      = 0x00000020,
+    GameInputLightingGroupLeftHeadset      = 0x00000040,
+    GameInputLightingGroupRightHeadset     = 0x00000080,
+    GameInputLightingGroupAll              = 0xFFFFFFFF,
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(GameInputLightingGroups)
 
 enum GameInputLabel
 {
@@ -491,6 +512,22 @@ enum GameInputLabel
     GameInputLabelPaddleLeft2              = 122,
     GameInputLabelPaddleRight1             = 123,
     GameInputLabelPaddleRight2             = 124,
+    GameInputLabelTouchpadButton           = 125,
+    GameInputLabelLeftThumbstickX          = 126,
+    GameInputLabelLeftThumbstickY          = 127,
+    GameInputLabelRightThumbstickX         = 128,
+    GameInputLabelRightThumbstickY         = 129,
+    GameInputLabelRoll                     = 130,
+    GameInputLabelPitch                    = 131,
+    GameInputLabelYaw                      = 132,
+    GameInputLabelThrottle                 = 133,
+    GameInputLabelSteering                 = 134,
+    GameInputLabelBrake                    = 135,
+    GameInputLabelClutch                   = 136,
+    GameInputLabelHandbrake                = 137,
+    GameInputLabelPatternShifter           = 138,
+    GameInputLabelFirePrimary              = 139,
+    GameInputLabelFireSecondary            = 140,
 };
 
 enum GameInputFeedbackAxes
@@ -558,6 +595,8 @@ constexpr GUID GAMEINPUT_HAPTIC_LOCATION_TRIGGER_RIGHT = { 0xff0cb557, 0x3af5, 0
 const uint32_t GAMEINPUT_HAPTIC_MAX_LOCATIONS              = 8;
 const uint32_t GAMEINPUT_HAPTIC_MAX_AUDIO_ENDPOINT_ID_SIZE = 256;
 
+const uint32_t GAMEINPUT_LIGHTING_GROUP_ORDER_INDEX_ALL = 0xFFFFFFFF;
+
 typedef void (CALLBACK* GameInputReadingCallback)(
     _In_ GameInputCallbackToken callbackToken,
     _In_ void* context,
@@ -566,26 +605,8 @@ typedef void (CALLBACK* GameInputReadingCallback)(
 typedef void (CALLBACK* GameInputDeviceCallback)(
     _In_ GameInputCallbackToken callbackToken,
     _In_ void* context,
-    _In_ IGameInputDevice* device,
-    _In_ uint64_t timestamp,
-    _In_ GameInputDeviceStatus currentStatus,
-    _In_ GameInputDeviceStatus previousStatus);
-
-typedef void (CALLBACK* GameInputSystemButtonCallback)(
-    _In_ GameInputCallbackToken callbackToken,
-    _In_ void* context,
-    _In_ IGameInputDevice* device,
-    _In_ uint64_t timestamp,
-    _In_ GameInputSystemButtons currentButtons,
-    _In_ GameInputSystemButtons previousButtons);
-
-typedef void (CALLBACK* GameInputKeyboardLayoutCallback)(
-    _In_ GameInputCallbackToken callbackToken,
-    _In_ void* context,
-    _In_ IGameInputDevice* device,
-    _In_ uint64_t timestamp,
-    _In_ uint32_t currentLayout,
-    _In_ uint32_t previousLayout);
+    _In_ GameInputDeviceEvent deviceEvent,
+    _In_ IGameInputDevice* device);
 
 struct GameInputKeyState
 {
@@ -636,6 +657,15 @@ struct GameInputSensorsState
     float orientationX;
     float orientationY;
     float orientationZ;
+};
+
+struct GameInputTouchContact
+{
+    uint64_t contactId;
+    int32_t screenX;
+    int32_t screenY;
+    uint32_t padX;
+    uint32_t padY;
 };
 
 struct GameInputArcadeStickState
@@ -689,16 +719,6 @@ struct GameInputControllerSwitchInfo
     GameInputSwitchKind kind;
 };
 
-struct GameInputControllerInfo
-{
-    uint32_t                                                                      controllerAxisCount;
-    _Field_size_full_(controllerAxisCount) const GameInputLabel*                  controllerAxisLabels;
-    uint32_t                                                                      controllerButtonCount;
-    _Field_size_full_(controllerButtonCount) const GameInputLabel*                controllerButtonLabels;
-    uint32_t                                                                      controllerSwitchCount;
-    _Field_size_full_(controllerSwitchCount) const GameInputControllerSwitchInfo* controllerSwitchInfo;
-};
-
 struct GameInputKeyboardInfo
 {
     GameInputKeyboardKind kind;
@@ -723,6 +743,21 @@ struct GameInputSensorsInfo
     GameInputSensorsKind supportedSensors;
 };
 
+enum GameInputTouchSurfaceType
+{
+    GameInputTouchSurfaceTypeUnknown     = 0,
+    GameInputTouchSurfaceTypeTouchscreen = 1,
+    GameInputTouchSurfaceTypeTouchpad    = 2,
+};
+
+struct GameInputTouchSurfaceInfo
+{
+    uint32_t maxContactCount;
+    uint32_t padWidth;
+    uint32_t padHeight;
+    GameInputTouchSurfaceType type;
+};
+
 struct GameInputArcadeStickInfo
 {
     GameInputLabel menuButtonLabel;
@@ -739,6 +774,8 @@ struct GameInputArcadeStickInfo
     GameInputLabel actionButton6Label;
     GameInputLabel specialButton1Label;
     GameInputLabel specialButton2Label;
+    GameInputLabel leftThumbstickButtonLabel;
+    GameInputLabel rightThumbstickButtonLabel;
     uint32_t       extraButtonCount;
     uint32_t       extraAxisCount;
 };
@@ -759,6 +796,10 @@ struct GameInputFlightStickInfo
     GameInputLabel yButtonLabel;
     GameInputLabel leftShoulderButtonLabel;
     GameInputLabel rightShoulderButtonLabel;
+    GameInputLabel rollLabel;
+    GameInputLabel pitchLabel;
+    GameInputLabel yawLabel;
+    GameInputLabel throttleLabel;
     uint32_t       extraButtonCount;
     uint32_t       extraAxisCount;
 };
@@ -782,6 +823,16 @@ struct GameInputGamepadInfo
     GameInputLabel          rightShoulderButtonLabel;
     GameInputLabel          leftThumbstickButtonLabel;
     GameInputLabel          rightThumbstickButtonLabel;
+    GameInputLabel          paddleLeft1Label;
+    GameInputLabel          paddleLeft2Label;
+    GameInputLabel          paddleRight1Label;
+    GameInputLabel          paddleRight2Label;
+    GameInputLabel          leftTriggerLabel;
+    GameInputLabel          rightTriggerLabel;
+    GameInputLabel          leftThumbstickXLabel;
+    GameInputLabel          leftThumbstickYLabel;
+    GameInputLabel          rightThumbstickXLabel;
+    GameInputLabel          rightThumbstickYLabel;
     uint32_t                extraButtonCount;
     uint32_t                extraAxisCount;
 };
@@ -802,6 +853,11 @@ struct GameInputRacingWheelInfo
     GameInputLabel yButtonLabel;
     GameInputLabel leftThumbstickButtonLabel;
     GameInputLabel rightThumbstickButtonLabel;
+    GameInputLabel steeringLabel;
+    GameInputLabel throttleLabel;
+    GameInputLabel brakeLabel;
+    GameInputLabel clutchLabel;
+    GameInputLabel handbrakeLabel;
     bool           hasClutch;
     bool           hasHandbrake;
     bool           hasPatternShifter;
@@ -833,43 +889,6 @@ struct GameInputRawDeviceReportInfo
     GameInputRawDeviceReportKind kind;
     uint32_t                     id;
     uint32_t                     size;
-};
-
-struct GameInputDeviceInfo
-{
-    uint16_t               vendorId;
-    uint16_t               productId;
-    uint16_t               revisionNumber;
-    GameInputUsage         usage;
-    GameInputVersion       hardwareVersion;
-    GameInputVersion       firmwareVersion;
-    APP_LOCAL_DEVICE_ID    deviceId;
-    APP_LOCAL_DEVICE_ID    deviceRootId;
-    GameInputDeviceFamily  deviceFamily;
-    GameInputKind          supportedInput;
-    GameInputRumbleMotors  supportedRumbleMotors;
-    GameInputSystemButtons supportedSystemButtons;
-    GUID                   containerId;
-    const char*            displayName;
-    const char*            pnpPath;
-
-    _Field_size_full_opt_(1) const GameInputKeyboardInfo*    keyboardInfo;
-    _Field_size_full_opt_(1) const GameInputMouseInfo*       mouseInfo;
-    _Field_size_full_opt_(1) const GameInputSensorsInfo*     sensorsInfo;
-    _Field_size_full_opt_(1) const GameInputControllerInfo*  controllerInfo;
-    _Field_size_full_opt_(1) const GameInputArcadeStickInfo* arcadeStickInfo;
-    _Field_size_full_opt_(1) const GameInputFlightStickInfo* flightStickInfo;
-    _Field_size_full_opt_(1) const GameInputGamepadInfo*     gamepadInfo;
-    _Field_size_full_opt_(1) const GameInputRacingWheelInfo* racingWheelInfo;
-
-    uint32_t forceFeedbackMotorCount;
-    _Field_size_full_(forceFeedbackMotorCount) const GameInputForceFeedbackMotorInfo* forceFeedbackMotorInfo;
-
-    uint32_t inputReportCount;
-    _Field_size_full_opt_(inputReportCount) const GameInputRawDeviceReportInfo* inputReportInfo;
-
-    uint32_t outputReportCount;
-    _Field_size_full_opt_(outputReportCount) const GameInputRawDeviceReportInfo* outputReportInfo;
 };
 
 struct GameInputHapticInfo
@@ -962,6 +981,13 @@ struct GameInputRumbleParams
     float rightTrigger;
 };
 
+struct GameInputColor
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
 enum GameInputElementKind
 {
     GameInputElementKindNone   = 0,
@@ -970,7 +996,8 @@ enum GameInputElementKind
     GameInputElementKindSwitch = 3
 };
 
-struct GameInputAxisMapping {
+struct GameInputAxisMapping
+{
     GameInputElementKind controllerElementKind;
     uint32_t             controllerIndex;
 
@@ -985,7 +1012,8 @@ struct GameInputAxisMapping {
     GameInputSwitchPosition referenceDirection;
 };
 
-struct GameInputButtonMapping {
+struct GameInputButtonMapping
+{
     GameInputElementKind controllerElementKind;
     uint32_t             controllerIndex;
 
@@ -998,9 +1026,9 @@ struct GameInputButtonMapping {
     GameInputSwitchPosition switchPosition;
 };
 
-const IID IID_IGameInput = {0x20efc1c7, 0x5d9a, 0x43ba, {0xb2, 0x6f, 0xb8, 0x07, 0xfa, 0x48, 0x60, 0x9c}};
+const IID IID_IGameInput = {0xf2daae4c, 0x4d21, 0x4250, {0x89, 0x53, 0x4f, 0x79, 0x1e, 0x62, 0x79, 0xab}};
 
-DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "20EFC1C7-5D9A-43BA-B26F-B807FA48609C")
+DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "F2DAAE4C-4D21-4250-8953-4F791E6279AB")
 {
     IFACEMETHOD_(uint64_t, GetCurrentTimestamp)() PURE;
 
@@ -1031,27 +1059,9 @@ DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "20EFC1C7-5D9A-43BA-B26F-B807FA4860
     IFACEMETHOD(RegisterDeviceCallback)(
         _In_opt_ IGameInputDevice* device,
         _In_ GameInputKind inputKind,
-        _In_ GameInputDeviceStatus statusFilter,
-        _In_ GameInputEnumerationKind enumerationKind,
         _In_opt_ void* context,
         _In_ GameInputDeviceCallback callbackFunc,
         _Out_opt_ _Result_zeroonfailure_ GameInputCallbackToken* callbackToken) PURE;
-
-    IFACEMETHOD(RegisterSystemButtonCallback)(
-        _In_opt_ IGameInputDevice* device,
-        _In_ GameInputSystemButtons buttonFilter,
-        _In_opt_ void* context,
-        _In_ GameInputSystemButtonCallback callbackFunc,
-        _Out_opt_ _Result_zeroonfailure_ GameInputCallbackToken* callbackToken) PURE;
-
-    IFACEMETHOD(RegisterKeyboardLayoutCallback)(
-        _In_opt_ IGameInputDevice* device,
-        _In_opt_ void* context,
-        _In_ GameInputKeyboardLayoutCallback callbackFunc,
-        _Out_opt_ _Result_zeroonfailure_ GameInputCallbackToken* callbackToken) PURE;
-
-    IFACEMETHOD_(void, StopCallback)(
-        _In_ GameInputCallbackToken callbackToken) PURE;
 
     IFACEMETHOD_(bool, UnregisterCallback)(
         _In_ GameInputCallbackToken callbackToken) PURE;
@@ -1067,8 +1077,8 @@ DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "20EFC1C7-5D9A-43BA-B26F-B807FA4860
         _In_ LPCWSTR value,
         _COM_Outptr_ IGameInputDevice** device) PURE;
 
-    IFACEMETHOD_(void, SetFocusPolicy)(
-        _In_ GameInputFocusPolicy policy) PURE;
+    IFACEMETHOD_(void, EnableBackgroundInput)(
+        bool enable) PURE;
 
     IFACEMETHOD(CreateAggregateDevice)(
         _In_ GameInputKind inputKind,
@@ -1078,7 +1088,7 @@ DECLARE_INTERFACE_IID_(IGameInput, IUnknown, "20EFC1C7-5D9A-43BA-B26F-B807FA4860
         _In_ const APP_LOCAL_DEVICE_ID* deviceId) PURE;
 };
 
-DECLARE_INTERFACE_IID_(IGameInputRawDeviceReport, IUnknown, "05A42D89-2CB6-45A3-874D-E635723587AB")
+DECLARE_INTERFACE_IID_(IGameInputRawDeviceReport, IUnknown, "E35550A9-8507-404B-823C-2035958A6936")
 {
     IFACEMETHOD_(void, GetDevice)(
         _Outptr_ IGameInputDevice** device) PURE;
@@ -1097,7 +1107,7 @@ DECLARE_INTERFACE_IID_(IGameInputRawDeviceReport, IUnknown, "05A42D89-2CB6-45A3-
         _In_reads_(bufferSize) const void* buffer) PURE;
 };
 
-DECLARE_INTERFACE_IID_(IGameInputReading, IUnknown, "C81C4CDE-ED1A-4631-A30F-C556A6241A1F")
+DECLARE_INTERFACE_IID_(IGameInputReading, IUnknown, "0DFAA2A2-688B-4A9C-A3A9-0FEB4F90EE12")
 {
     IFACEMETHOD_(GameInputKind, GetInputKind)() PURE;
 
@@ -1150,17 +1160,135 @@ DECLARE_INTERFACE_IID_(IGameInputReading, IUnknown, "C81C4CDE-ED1A-4631-A30F-C55
 
     IFACEMETHOD_(bool, GetRawReport)(
         _Outptr_result_maybenull_ IGameInputRawDeviceReport** report) PURE;
+
+    IFACEMETHOD_(bool, GetSystemButtonState)(
+        _Out_ GameInputSystemButtons* buttons) PURE;
+
+    IFACEMETHOD_(uint32_t, GetTouchContactCount)(
+        uint32_t surfaceIndex) PURE;
+
+    IFACEMETHOD_(uint32_t, GetTouchSurfaceState)(
+        uint32_t surfaceIndex,
+        uint32_t contactArrayCount,
+        _Out_writes_to_opt_(contactArrayCount, return) GameInputTouchContact* contactArray) PURE;
 };
 
-DECLARE_INTERFACE_IID_(IGameInputDevice, IUnknown, "63E2F38B-A399-4275-8AE7-D4C6E524D12A")
+DECLARE_INTERFACE_IID_(IGameInputDevice, IUnknown, "4420F01D-8918-49D4-B302-DBEAD986105F")
 {
-    IFACEMETHOD(GetDeviceInfo)(
-        _Outptr_ const GameInputDeviceInfo** info) PURE;
+    IFACEMETHOD_(uint16_t, GetVendorId)() PURE;
+
+    IFACEMETHOD_(uint16_t, GetProductId)() PURE;
+
+    IFACEMETHOD_(uint16_t, GetRevisionNumber)() PURE;
+
+    IFACEMETHOD_(void, GetUsage)(
+        _Out_ GameInputUsage* usage) PURE;
+
+    IFACEMETHOD_(void, GetHardwareVersion)(
+        _Out_ GameInputVersion* version) PURE;
+
+    IFACEMETHOD_(void, GetFirmwareVersion)(
+        _Out_ GameInputVersion* version) PURE;
+
+    IFACEMETHOD_(void, GetDeviceId)(
+        _Out_ APP_LOCAL_DEVICE_ID* deviceId) PURE;
+
+    IFACEMETHOD_(void, GetDeviceRootId)(
+        _Out_ APP_LOCAL_DEVICE_ID* deviceRootId) PURE;
+
+    IFACEMETHOD_(GameInputDeviceFamily, GetDeviceFamily)() PURE;
+
+    IFACEMETHOD_(GameInputKind, GetSupportedInput)() PURE;
+
+    IFACEMETHOD_(GameInputRumbleMotors, GetSupportedRumbleMotors)() PURE;
+
+    IFACEMETHOD_(GameInputSystemButtons, GetSupportedSystemButtons)() PURE;
+
+    IFACEMETHOD_(GameInputLightingGroups, GetSupportedLightingGroups)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetSupportedLightingGroupSize)(GameInputLightingGroups group) PURE;
+
+    IFACEMETHOD_(void, GetContainerId)(
+        _Out_ GUID* containerId) PURE;
+
+    IFACEMETHOD_(uint32_t, GetDisplayName)(
+        _In_ uint32_t bufferByteCount,
+        _Out_writes_bytes_opt_(bufferByteCount) char* buffer) PURE;
+
+    IFACEMETHOD_(uint32_t, GetPnpPath)(
+        _In_ uint32_t bufferByteCount,
+        _Out_writes_bytes_opt_(bufferByteCount) char* buffer) PURE;
+
+    IFACEMETHOD_(bool, GetXInputDeviceIndex)(
+        _Out_ uint32_t* index) PURE;
+
+    IFACEMETHOD_(bool, GetKeyboardInfo)(
+        _Out_ GameInputKeyboardInfo* info) PURE;
+
+    IFACEMETHOD_(bool, GetMouseInfo)(
+        _Out_ GameInputMouseInfo* info) PURE;
+
+    IFACEMETHOD_(bool, GetSensorsInfo)(
+        _Out_ GameInputSensorsInfo* info) PURE;
+
+    IFACEMETHOD_(uint32_t, GetControllerAxisCount)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetControllerAxisLabels)(
+        _In_ uint32_t labelArrayCount,
+        _Out_writes_to_opt_(labelArrayCount, return) GameInputLabel* labelArray) PURE;
+
+    IFACEMETHOD_(uint32_t, GetControllerButtonCount)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetControllerButtonLabels)(
+        _In_ uint32_t labelArrayCount,
+        _Out_writes_to_opt_(labelArrayCount, return) GameInputLabel* labelArray) PURE;
+
+    IFACEMETHOD_(uint32_t, GetControllerSwitchCount)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetControllerSwitchInfo)(
+        _In_ uint32_t infoArrayCount,
+        _Out_writes_to_opt_(infoArrayCount, return) GameInputControllerSwitchInfo* infoArray) PURE;
+
+    IFACEMETHOD_(bool, GetArcadeStickInfo)(
+        _Out_ GameInputArcadeStickInfo* info) PURE;
+
+    IFACEMETHOD_(bool, GetFlightStickInfo)(
+        _Out_ GameInputFlightStickInfo* info) PURE;
+
+    IFACEMETHOD_(bool, GetGamepadInfo)(
+        _Out_ GameInputGamepadInfo* info) PURE;
+
+    IFACEMETHOD_(bool, GetRacingWheelInfo)(
+        _Out_ GameInputRacingWheelInfo* info) PURE;
+
+    IFACEMETHOD_(uint32_t, GetForceFeedbackMotorCount)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetForceFeedbackMotorInfo)(
+        _In_ uint32_t infoArrayCount,
+        _Out_writes_to_opt_(infoArrayCount, return) GameInputForceFeedbackMotorInfo* infoArray) PURE;
+
+    IFACEMETHOD_(uint32_t, GetInputReportCount)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetInputReportInfo)(
+        _In_ uint32_t infoArrayCount,
+        _Out_writes_to_opt_(infoArrayCount, return) GameInputRawDeviceReportInfo* infoArray) PURE;
+
+    IFACEMETHOD_(uint32_t, GetOutputReportCount)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetOutputReportInfo)(
+        _In_ uint32_t infoArrayCount,
+        _Out_writes_to_opt_(infoArrayCount, return) GameInputRawDeviceReportInfo* infoArray) PURE;
+
+    IFACEMETHOD_(uint32_t, GetFeatureReportCount)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetFeatureReportInfo)(
+        _In_ uint32_t infoArrayCount,
+        _Out_writes_to_opt_(infoArrayCount, return) GameInputRawDeviceReportInfo* infoArray) PURE;
 
     IFACEMETHOD(GetHapticInfo)(
         _Out_ GameInputHapticInfo* info) PURE;
 
-    IFACEMETHOD_(GameInputDeviceStatus, GetDeviceStatus)() PURE;
+    IFACEMETHOD_(bool, IsConnected)() PURE;
 
     IFACEMETHOD(CreateForceFeedbackEffect)(
         _In_ uint32_t motorIndex,
@@ -1211,8 +1339,30 @@ DECLARE_INTERFACE_IID_(IGameInputDevice, IUnknown, "63E2F38B-A399-4275-8AE7-D4C6
         _In_ GameInputRawDeviceReportKind reportKind,
         _COM_Outptr_ IGameInputRawDeviceReport** report) PURE;
 
+    IFACEMETHOD(GetRawDeviceFeature)(
+        _In_ uint32_t reportId,
+        _COM_Outptr_ IGameInputRawDeviceReport** report) PURE;
+
+    IFACEMETHOD(SetRawDeviceFeature)(
+        _In_ IGameInputRawDeviceReport* report) PURE;
+
     IFACEMETHOD(SendRawDeviceOutput)(
         _In_ IGameInputRawDeviceReport* report) PURE;
+
+    IFACEMETHOD_(void, SetLightingColor)(
+        GameInputColor color,
+        GameInputLightingGroups group,
+        _In_opt_ uint32_t groupOrderIndex = GAMEINPUT_LIGHTING_GROUP_ORDER_INDEX_ALL) PURE;
+
+    IFACEMETHOD_(void, ApplyLightingColors)() PURE;
+
+    IFACEMETHOD_(void, ApplyLightingSystemDefault)() PURE;
+
+    IFACEMETHOD_(uint32_t, GetTouchSurfaceCount)() PURE;
+
+    IFACEMETHOD(GetTouchSurfaceInfo)(
+        uint32_t surfaceIndex,
+        _Out_ GameInputTouchSurfaceInfo* info) PURE;
 };
 
 DECLARE_INTERFACE_IID_(IGameInputDispatcher, IUnknown, "415EED2E-98CB-42C2-8F28-B94601074E31")
@@ -1224,7 +1374,7 @@ DECLARE_INTERFACE_IID_(IGameInputDispatcher, IUnknown, "415EED2E-98CB-42C2-8F28-
         _Outptr_result_nullonfailure_ HANDLE* waitHandle) PURE;
 };
 
-DECLARE_INTERFACE_IID_(IGameInputForceFeedbackEffect, IUnknown, "FF61096A-3373-4093-A1DF-6D31846B3511")
+DECLARE_INTERFACE_IID_(IGameInputForceFeedbackEffect, IUnknown, "BB3500C0-4B43-44CA-81A2-382FC63AE0E9")
 {
     IFACEMETHOD_(void, GetDevice)(
         _Outptr_ IGameInputDevice** device) PURE;
@@ -1304,7 +1454,7 @@ const HRESULT GAMEINPUT_E_HAPTIC_INFO_NOT_FOUND             = _HRESULT_TYPEDEF_(
 const HRESULT GAMEINPUT_E_AGGREGATE_OPERATION_NOT_SUPPORTED = _HRESULT_TYPEDEF_(0x838A000BL);
 const HRESULT GAMEINPUT_E_INPUT_KIND_NOT_PRESENT            = _HRESULT_TYPEDEF_(0x838A000CL);
 
-}} // namespace GameInput::v3
+}} // namespace GameInput::v4
 
 #endif // #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP | WINAPI_PARTITION_SYSTEM | WINAPI_PARTITION_GAMES)
 #pragma endregion // Application Family or OneCore Family or Games Family
