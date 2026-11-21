@@ -4,6 +4,11 @@
 #include <unknwn.h>
 #include <stdint.h>
 
+#if __cplusplus < 2011003L
+#define noexcept
+#define nullptr NULL
+#endif
+
 namespace GameInput {
 
 
@@ -59,6 +64,13 @@ template <typename T>
 class Vector
 {
 public:
+    Vector()
+        : m_data(nullptr)
+        , m_count(0)
+        , m_capacity(0)
+    {
+    }
+
     ~Vector()
     {
         if (m_data != nullptr)
@@ -120,9 +132,9 @@ public:
     }
 
 private:
-    T*     m_data = nullptr;
-    size_t m_count = 0;
-    size_t m_capacity = 0;
+    T*     m_data;
+    size_t m_count;
+    size_t m_capacity;
 };
 
 template <typename T>
@@ -201,8 +213,8 @@ private:
     Vector<T> m_string;
 };
 
-using WString = String<wchar_t>;
-using AString = String<char>;
+typedef String<wchar_t> WString;
+typedef String<char> AString;
 
 
 //
@@ -258,10 +270,11 @@ static HRESULT GetSystemDirectory(
 static HRESULT GetRedistDirectory(
     _Inout_ WString* redistDir) noexcept
 {
-    constexpr const wchar_t* RedistDirRegPath = L"SOFTWARE\\Microsoft\\GameInput";
-    constexpr const wchar_t* RedistDirValueName = L"RedistDir";
+    static const wchar_t RedistDirRegPath[] = L"SOFTWARE\\Microsoft\\GameInput";
+    static const wchar_t RedistDirValueName[] = L"RedistDir";
 
-    decltype(RegGetValueW)* regGetValue = nullptr;
+    typedef LONG (WINAPI *RegGetValueW_t)(HKEY,LPCWSTR,LPCWSTR,DWORD,LPDWORD,PVOID,LPDWORD);
+    RegGetValueW_t regGetValue = nullptr;
     RETURN_IF_FAILED(LoadSystemModuleProc(
         &g_advapi32Dll,
         L"advapi32.dll",
@@ -300,21 +313,24 @@ static HRESULT GetFileVersion(
 {
     *version = 0;
 
-    decltype(GetFileVersionInfoSizeW)* getFileVersionInfoSize = nullptr;
+    typedef DWORD (WINAPI *GetFileVersionInfoSizeW_t)(LPCWSTR,LPDWORD);
+    GetFileVersionInfoSizeW_t getFileVersionInfoSize = nullptr;
     RETURN_IF_FAILED(LoadSystemModuleProc(
         &g_versionDll,
         L"version.dll",
         "GetFileVersionInfoSizeW",
         &getFileVersionInfoSize));
 
-    decltype(GetFileVersionInfoW)* getFileVersionInfo = nullptr;
+    typedef BOOL (WINAPI *GetFileVersionInfoW_t)(LPCWSTR,DWORD,DWORD,LPVOID);
+    GetFileVersionInfoW_t getFileVersionInfo = nullptr;
     RETURN_IF_FAILED(LoadSystemModuleProc(
         &g_versionDll,
         L"version.dll",
         "GetFileVersionInfoW",
         &getFileVersionInfo));
 
-    decltype(VerQueryValueW)* verQueryValue = nullptr;
+    typedef BOOL (WINAPI *VerQueryValueW_t)(LPCVOID,LPCWSTR,LPVOID*,PUINT);
+    VerQueryValueW_t verQueryValue = nullptr;
     RETURN_IF_FAILED(LoadSystemModuleProc(
         &g_versionDll,
         L"version.dll",
@@ -480,7 +496,7 @@ static HRESULT GameInputCreateWithVersion(
         RETURN_IF_FAILED(LoadGameInputDll(&g_gameInputDll));
     }
 
-    using GameInputInitializeFn = HRESULT (*)(
+    typedef HRESULT (*GameInputInitializeFn)(
         _In_ REFIID riid,
         _COM_Outptr_ LPVOID* ppv);
 
@@ -496,7 +512,7 @@ static HRESULT GameInputCreateWithVersion(
         // did not find it via above query, we must be running an old version of GameInput
         // which only supports the v0 API. Don't attempt to use it for newer API versions.
 
-        using GameInputCreateFn = HRESULT (*)(
+        typedef HRESULT (*GameInputCreateFn)(
             _COM_Outptr_ LPVOID* ppv);
 
         GameInputCreateFn gameInputCreate = nullptr;
